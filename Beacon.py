@@ -2,20 +2,20 @@
 import sys
 import socket
 import json
-# from bluepy.btle import Scanner, DefaultDelegate
+from bluepy.btle import Scanner, DefaultDelegate, Peripheral
 #
-# class myDelegate(DefaultDelegate):
-#     def __init__(self):
-#             DefaultDelegate.__init__(self)
-#     def handleDiscovery(self, dev, isNewDev, isNewData):
-#         if isNewDev and dev.addr == "dd:33:16:00:02:dc":
-#                 print(f"my name is {dev.getValueText(9)}")
-#                 beacondict = {"address":dev.addr,"rssi":dev.rssi}
+class myDelegate(DefaultDelegate):
+     def __init__(self):
+             DefaultDelegate.__init__(self)
+     def handleDiscovery(self, dev, isNewDev, isNewData):
+         if isNewDev and dev.addr == "dd:33:16:00:02:dc":
+                 print(f"my name is {dev.getValueText(9)}")
+                 beacondict = {"address":dev.addr,"rssi":dev.rssi}
 #     def handleNotification(self, cHandle, data):
 #
 # #Initialize Beacon
-# p = btle.Peripheral("dd:33:16:00:02:dc")
-# p.setDelegate(myDelegate())
+p = Peripheral("dd:33:16:00:02:dc")
+p.setDelegate(myDelegate())
 #
 # #setup notifications
 # service = p.getServicebyUUID()
