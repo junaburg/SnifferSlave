@@ -27,27 +27,18 @@ class myDelegate(DefaultDelegate):
             return True
 
 
-# bdict = myDelegate().beacondict
-# #setup notifications
-#
-#
-#
-#
-#
-#
-
 class Data:
-    def __init__(self):
-        Data.__init__(self)
-
-    def connection(self, update_data):
+    @staticmethod
+    def connection(data):
         # send dictionary with update data here
 
         req = requests.put('http://192.168.4.1/sniffer/event/',
                            headers={'content-type': 'application/json'},
-                           json=update_data,
+                           json=data,
                            )
-        #400 is if the code sent is not a json file or not able to be sent in a json packet
+        print("sending data to host")
+
+        # 400 is if the code sent is not a json file or not able to be sent in a json packet
         if req.status_code == 400:
             print("the data is incorrectly formatted or sent incorrectly")
             print(req.text)
@@ -65,5 +56,6 @@ class Startup:
     p = btle.Peripheral("dd:33:16:00:02:dc")
     while True:
         p.setDelegate(myDelegate())
-        if (p):
-            r.connection(myDelegate().beacondict)
+        if p:
+            Data.connection(myDelegate().beacondict)
+            print("sending data to host")
