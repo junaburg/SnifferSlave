@@ -1,7 +1,7 @@
 import requests
 import socket
 from datetime import datetime
-
+from logging import getLogger, config
 from bluepy.btle import Scanner, DefaultDelegate, Peripheral
 
 
@@ -13,15 +13,15 @@ class myDelegate(DefaultDelegate):
     def handleDiscovery(self, dev, isNewDev, isNewData):
         if isNewDev and dev.addr == "dd:33:16:00:02:dc":
             now = datetime.now()
-            now_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
 
             self.beacondict = {
                 "sniffer_serial": "xxxx-xxxx-xxxx-xxxx",
                 "address": dev.addr,
-                "rssi": dev.rssi,
+                "rssi": int(dev.rssi),
                 "source_addr": socket.gethostname(),
-                "time": now_string
+                "event_time": now_string
             }
             return True
 
@@ -51,9 +51,33 @@ class Data:
 if __name__ == '__main__':
     # Initialize Beacon
     r = Data
-    p = btle.Peripheral("dd:33:16:00:02:dc")
+    scanner = Scanner().withDelegate(myDelegate())
     while True:
-        p.withDelegate(myDelegate())
-        if p:
-            Data.connection(myDelegate().beacondict)
-            print("sending data to host")
+        devices = scanner.scan(10.0)
+        for dev in devices:
+            if dev.addr == "dd:33:16:00:02:dc":
+                Data.connection(myDelegate().beacondict)
+                print("sending data to host")
+
+        config.dictConfig({
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'default': {
+                    'format': '[%(asctime)s] %(levelname)s: %(message)s',
+                }
+            },
+            'handlers': {
+                'file': {
+                    'class': 'logging.handlers.TimedRotatingFileHandler',
+                    'filename': '../SnifferSlave/log.txt',
+                    'when': 'midnight',
+                    'backupCount': 60,
+                    'formatter': 'default',
+                },
+            },
+            'root': {
+                'handlers': ['file'],
+                'level': 'INFO',
+            },
+        })
