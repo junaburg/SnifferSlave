@@ -1,6 +1,5 @@
-import sys
 import requests
-import json
+import socket
 from datetime import datetime
 
 from bluepy.btle import Scanner, DefaultDelegate, Peripheral
@@ -21,7 +20,7 @@ class myDelegate(DefaultDelegate):
                 "sniffer_serial": "xxxx-xxxx-xxxx-xxxx",
                 "address": dev.addr,
                 "rssi": dev.rssi,
-                "source_addr": "192.168.4.7",
+                "source_addr": socket.gethostname(),
                 "time": now_string
             }
             return True
@@ -31,7 +30,6 @@ class Data:
     @staticmethod
     def connection(data):
         # send dictionary with update data here
-
         req = requests.put('http://192.168.4.1/sniffer/event/',
                            headers={'content-type': 'application/json'},
                            json=data,
@@ -50,12 +48,12 @@ class Data:
         req.close()
 
 
-class Startup:
+if __name__ == '__main__':
     # Initialize Beacon
     r = Data
     p = btle.Peripheral("dd:33:16:00:02:dc")
     while True:
-        p.setDelegate(myDelegate())
+        p.withDelegate(myDelegate())
         if p:
             Data.connection(myDelegate().beacondict)
             print("sending data to host")
