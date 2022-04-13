@@ -32,12 +32,12 @@ LOGGER = getLogger()
 
 SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
 # this handles beacon discovery and puts it into a dict
-class myDelegate(DefaultDelegate):
+class SnifferDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
-        if isNewDev and dev.addr == "dd:33:16:00:02:dc":
+        if dev.addr == "dd:33:16:00:02:dc":
             now = datetime.now()
             now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
@@ -80,13 +80,7 @@ class myDelegate(DefaultDelegate):
 
 if __name__ == '__main__':
     # Initialize Beacon
-    r = Data
-    scanner = Scanner().withDelegate(myDelegate())
+    scanner = Scanner().withDelegate(SnifferDelegate())
     while True:
         devices = scanner.scan(10.0)
-        for dev in devices:
-            if dev.addr == "dd:33:16:00:02:dc":
-                Data.connection(myDelegate().beacondict)
-                print("sending data to host")
-
 
