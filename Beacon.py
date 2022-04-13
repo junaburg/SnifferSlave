@@ -65,10 +65,11 @@ class SnifferDelegate(DefaultDelegate):
             elif req.status_code == 400:
                 print("the data is incorrectly formatted or sent incorrectly")
                 print(req.text)
-                LOGGER.error("")
+                LOGGER.error("the data sent is formatted incorrectly")
 
             else:
                 print("there was an error not listed")
+                LOGGER.error("a status code not listed was returned")
 
 
             # There was an error processing the request
