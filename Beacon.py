@@ -1,10 +1,36 @@
 import requests
 import socket
+import os
 from datetime import datetime
 from logging import getLogger, config
-from bluepy.btle import Scanner, DefaultDelegate, Peripheral
+from bluepy.btle import Scanner, DefaultDelegate
 
+config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '[%(asctime)s] %(levelname)s: %(message)s',
+        }
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': '../SnifferSlave/log.txt',
+            'when': 'midnight',
+            'backupCount': 60,
+            'formatter': 'default',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'INFO',
+    },
+})
 
+LOGGER = getLogger()
+
+SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
 # this handles beacon discovery and puts it into a dict
 class myDelegate(DefaultDelegate):
     def __init__(self):
@@ -15,37 +41,41 @@ class myDelegate(DefaultDelegate):
             now = datetime.now()
             now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
+            LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
 
-            self.beacondict = {
-                "sniffer_serial": "xxxx-xxxx-xxxx-xxxx",
+            beacondict = {
+                "sniffer_serial": SNIFFER_SERIAL,
                 "address": dev.addr,
                 "rssi": int(dev.rssi),
-                "source_addr": socket.gethostname(),
                 "event_time": now_string
             }
+
+            # send dictionary with update data here
+            req = requests.put('http://192.168.4.1/api/event/',
+                               headers={'content-type': 'application/json'},
+                               json=beacondict
+                               )
+            print("sending data to host")
+
+            # 400 is if the code sent is not a json file or not able to be sent in a json packet
+            if req.status_code == 201:
+                LOGGER.info("Request created successfully")
+            elif req.status_code == 208:
+                LOGGER.info("Duplicate request sent")
+            elif req.status_code == 400:
+                print("the data is incorrectly formatted or sent incorrectly")
+                print(req.text)
+                LOGGER.error("")
+
+            else:
+                print("there was an error not listed")
+
+
+            # There was an error processing the request
+
+            req.close()
             return True
 
-
-class Data:
-    @staticmethod
-    def connection(data):
-        # send dictionary with update data here
-        req = requests.put('http://192.168.4.1/sniffer/event/',
-                           headers={'content-type': 'application/json'},
-                           json=data,
-                           )
-        print("sending data to host")
-
-        # 400 is if the code sent is not a json file or not able to be sent in a json packet
-        if req.status_code == 400:
-            print("the data is incorrectly formatted or sent incorrectly")
-            print(req.text)
-        else:
-            print("there was an error or something")
-
-        # There was an error processing the request
-
-        req.close()
 
 
 if __name__ == '__main__':
@@ -59,25 +89,4 @@ if __name__ == '__main__':
                 Data.connection(myDelegate().beacondict)
                 print("sending data to host")
 
-        config.dictConfig({
-            'version': 1,
-            'disable_existing_loggers': False,
-            'formatters': {
-                'default': {
-                    'format': '[%(asctime)s] %(levelname)s: %(message)s',
-                }
-            },
-            'handlers': {
-                'file': {
-                    'class': 'logging.handlers.TimedRotatingFileHandler',
-                    'filename': '../SnifferSlave/log.txt',
-                    'when': 'midnight',
-                    'backupCount': 60,
-                    'formatter': 'default',
-                },
-            },
-            'root': {
-                'handlers': ['file'],
-                'level': 'INFO',
-            },
-        })
+
