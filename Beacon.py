@@ -31,6 +31,8 @@ config.dictConfig({
 LOGGER = getLogger()
 
 SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
+
+
 # this handles beacon discovery and puts it into a dict
 class SnifferDelegate(DefaultDelegate):
     def __init__(self):
@@ -41,8 +43,10 @@ class SnifferDelegate(DefaultDelegate):
             now = datetime.now()
             now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
-            LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
-
+            if dev.getValueText(9) != None:
+                LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
+            else:
+                LOGGER.info("no characteristics recieved")
             beacondict = {
                 "sniffer_serial": SNIFFER_SERIAL,
                 "address": dev.addr,
@@ -65,11 +69,11 @@ class SnifferDelegate(DefaultDelegate):
             elif req.status_code == 400:
                 print("the data is incorrectly formatted or sent incorrectly")
                 print(req.text)
-                LOGGER.error("")
+                LOGGER.error("the data sent is formatted incorrectly")
 
             else:
                 print("there was an error not listed")
-
+                LOGGER.error("a status code not listed was returned")
 
             # There was an error processing the request
 
@@ -77,10 +81,8 @@ class SnifferDelegate(DefaultDelegate):
             return True
 
 
-
 if __name__ == '__main__':
     # Initialize Beacon
     scanner = Scanner().withDelegate(SnifferDelegate())
     while True:
         devices = scanner.scan(10.0)
-
