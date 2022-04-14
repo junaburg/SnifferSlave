@@ -51,7 +51,7 @@ class SnifferDelegate(DefaultDelegate):
                 LOGGER.info("no characteristics recieved")
 
             LOGGER.info("Request Data:\nSerial: %s\nBeacon Address: %s\nTime: %s", SNIFFER_SERIAL, dev.addr, now_string)
-            print("Request Data:\nSerial: %s\nBeacon Address: %s\nTime: %s".format(SNIFFER_SERIAL, dev.addr, now_string))
+            print(f"Request Data:\nSerial: {SNIFFER_SERIAL}\nBeacon Address: {dev.addr}\nTime: {now_string}")
             beacondict = {
                 "sniffer_serial": SNIFFER_SERIAL,
                 "beacon_addr": dev.addr,
