@@ -48,7 +48,7 @@ class SnifferDelegate(DefaultDelegate):
         super().__init__()
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
-        print(f"Discovered device {dev.addr}")
+        logging.info(f"Discovered device {dev.addr}")
         if dev.addr == "dd:33:16:00:02:dc":
             now = datetime.now().isoformat()
             # now_string = now.strftime("%m-%d-%y %H:%M:%S.%fz")
@@ -69,14 +69,13 @@ class SnifferDelegate(DefaultDelegate):
             print("Sending data to master...")
 
             # send dictionary with update data here
-            req = requests.Request("PUT",
+            req = requests.Request(method="PUT",
                                    url='http://192.168.4.1/api/event/',
                                    headers={'content-type': 'application/json'},
                                    json=beacondict
                                    )
 
             REQUEST_QUEUE.put(req)
-
 
 
 class RequestHandler(threading.Thread):
@@ -127,8 +126,8 @@ class RequestHandler(threading.Thread):
 if __name__ == '__main__':
     # Initialize Beacon
     scanner = Scanner().withDelegate(SnifferDelegate())
-    requests = RequestHandler(REQUEST_QUEUE)
-    requests.start()
+    request_handler = RequestHandler(REQUEST_QUEUE)
+    request_handler.start()
 
     while True:
         print("Scanning...")
