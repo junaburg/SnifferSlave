@@ -85,4 +85,4 @@ if __name__ == '__main__':
 
     while True:
         #devices = scanner.scan(10.0)
-        p.connect("dd:33:16:00:02:dc").withDelegate(SnifferDelegate())
+        p.connect("dd:33:16:00:02:dc", addrType=ADDR_TYPE_RANDOM).withDelegate(SnifferDelegate())
