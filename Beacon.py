@@ -81,8 +81,8 @@ class SnifferDelegate(DefaultDelegate):
 if __name__ == '__main__':
     # Initialize Beacon
     # scanner = Scanner().withDelegate(SnifferDelegate())
-    p = Peripheral("dd:33:16:00:02:dc", "public")
+    p = Peripheral()
 
     while True:
         #devices = scanner.scan(10.0)
-        p.withDelegate(SnifferDelegate())
+        p.connect("dd:33:16:00:02:dc").withDelegate(SnifferDelegate())
