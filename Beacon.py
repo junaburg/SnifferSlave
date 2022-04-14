@@ -33,6 +33,7 @@ LOGGER = getLogger()
 
 SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
 
+
 # this handles beacon discovery and puts it into a dict
 class SnifferDelegate(DefaultDelegate):
     def __init__(self):
@@ -41,8 +42,8 @@ class SnifferDelegate(DefaultDelegate):
     def handleDiscovery(self, dev, isNewDev, isNewData):
         print(f"Discovered device {dev.addr}")
         if dev.addr == "dd:33:16:00:02:dc":
-            now = datetime.now()
-            now_string = now.strftime("%m-%d-%y %H:%M:%S.%fz")
+            now = datetime.now().isoformat()
+            # now_string = now.strftime("%m-%d-%y %H:%M:%S.%fz")
 
             if dev.getValueText(9) is not None:
                 print(f"Found beacon at {dev.addr} name: {dev.getValueText(9)}")
@@ -56,7 +57,7 @@ class SnifferDelegate(DefaultDelegate):
                 "sniffer_serial": SNIFFER_SERIAL,
                 "beacon_addr": dev.addr,
                 "rssi": int(dev.rssi),
-                "event_time": now_string
+                "event_time": now
             }
 
             print("Sending data to master...")
@@ -66,7 +67,6 @@ class SnifferDelegate(DefaultDelegate):
                                headers={'content-type': 'application/json'},
                                json=beacondict
                                )
-
 
             # 400 is if the code sent is not a json file or not able to be sent in a json packet
             if req.status_code == 201:
