@@ -85,4 +85,4 @@ if __name__ == '__main__':
 
     while True:
         #devices = scanner.scan(10.0)
-        p.setDelegate(SnifferDelegate())
+        p.withDelegate(SnifferDelegate())
