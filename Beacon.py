@@ -101,9 +101,9 @@ class RequestHandler(threading.Thread):
             except queue.Empty:
                 break
             else:
-                # TODO: Process Request
                 prepared = session.prepare_request(req)
                 response = session.send(prepared)
+                logging.info("Recieve response with code: %d", response.status_code)
 
                 # 400 is if the code sent is not a json file or not able to be sent in a json packet
                 if response.status_code == 201:
@@ -135,4 +135,4 @@ if __name__ == '__main__':
         scanner.process(10)
         scanner.stop()
         scanner.clear()
-        time.sleep(10)
+        time.sleep(1)
