@@ -1,3 +1,5 @@
+import time
+
 import requests
 import os
 from datetime import datetime
@@ -83,4 +85,8 @@ if __name__ == '__main__':
     scanner = Scanner().withDelegate(SnifferDelegate())
 
     while True:
-        devices = scanner.scan(10.0)
+        scanner.start()
+        scanner.process(10)
+        scanner.stop()
+        scanner.clear()
+        time.sleep(1)
