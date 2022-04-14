@@ -37,14 +37,16 @@ SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
 # this handles beacon discovery and puts it into a dict
 class SnifferDelegate(DefaultDelegate):
     def __init__(self):
-        DefaultDelegate.__init__(self)
+        super().__init__()
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
+        print(f"Discovered device {dev.addr}")
         if dev.addr == "dd:33:16:00:02:dc":
             now = datetime.now()
             now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
             if dev.getValueText(9) is not None:
+                print(f"Found beacon at {dev.addr} name: {dev.getValueText(9)}")
                 LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
             else:
                 LOGGER.info("no characteristics recieved")
@@ -60,7 +62,7 @@ class SnifferDelegate(DefaultDelegate):
                                headers={'content-type': 'application/json'},
                                json=beacondict
                                )
-            print("sending data to host")
+            print("Sending data to master...")
 
             # 400 is if the code sent is not a json file or not able to be sent in a json packet
             if req.status_code == 201:
@@ -75,8 +77,6 @@ class SnifferDelegate(DefaultDelegate):
                 print("there was an error not listed")
                 LOGGER.error("a status code not listed was returned")
 
-            # There was an error processing the request
-
             req.close()
 
 
@@ -85,6 +85,7 @@ if __name__ == '__main__':
     scanner = Scanner().withDelegate(SnifferDelegate())
 
     while True:
+        print("Scanning...")
         scanner.start()
         scanner.process(10)
         scanner.stop()
