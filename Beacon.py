@@ -128,11 +128,12 @@ if __name__ == '__main__':
     scanner = Scanner().withDelegate(SnifferDelegate())
     request_handler = RequestHandler(REQUEST_QUEUE)
     request_handler.start()
-
+    # Wait for the bluetooth device to power up
+    time.sleep(10)
     while True:
         print("Scanning...")
-        scanner.start()
-        scanner.process(10)
-        scanner.stop()
-        scanner.clear()
+        try:
+            scanner.scan(10)
+        except bluepy.btle.BTLEManagementError as e:
+            LOGGER.error("Error running scan!", exec_info=e)
         time.sleep(1)
