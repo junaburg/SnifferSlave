@@ -19,7 +19,7 @@ config.dictConfig({
     'handlers': {
         'file': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': '../SnifferSlave/log.txt',
+            'filename': '/home/pi/SnifferSlave/log.txt',
             'when': 'midnight',
             'backupCount': 60,
             'formatter': 'default',
