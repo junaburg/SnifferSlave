@@ -1,9 +1,8 @@
 import requests
-import socket
 import os
 from datetime import datetime
 from logging import getLogger, config
-from bluepy.btle import Scanner, DefaultDelegate
+from bluepy.btle import Scanner, DefaultDelegate, Peripheral
 
 config.dictConfig({
     'version': 1,
@@ -81,6 +80,9 @@ class SnifferDelegate(DefaultDelegate):
 
 if __name__ == '__main__':
     # Initialize Beacon
-    scanner = Scanner().withDelegate(SnifferDelegate())
+    # scanner = Scanner().withDelegate(SnifferDelegate())
+    p = Peripheral("dd:33:16:00:02:dc",ADDR_TYPE_PUBLIC)
+
     while True:
-        devices = scanner.scan(10.0)
+        #devices = scanner.scan(10.0)
+        p.setDelegate(SnifferDelegate())
