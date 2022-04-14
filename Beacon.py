@@ -33,7 +33,6 @@ LOGGER = getLogger()
 
 SNIFFER_SERIAL = os.getenv('SNIFFER_SERIAL')
 
-
 # this handles beacon discovery and puts it into a dict
 class SnifferDelegate(DefaultDelegate):
     def __init__(self):
@@ -43,8 +42,8 @@ class SnifferDelegate(DefaultDelegate):
         print(f"Discovered device {dev.addr}")
         if dev.addr == "dd:33:16:00:02:dc":
             now = datetime.now()
-            now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
-            print(f"my name is {dev.getValueText(9)}")
+            now_string = now.strftime("%m-%d-%y %H:%M:%S.%fz")
+
             if dev.getValueText(9) is not None:
                 print(f"Found beacon at {dev.addr} name: {dev.getValueText(9)}")
                 LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
@@ -52,17 +51,19 @@ class SnifferDelegate(DefaultDelegate):
                 LOGGER.info("no characteristics recieved")
             beacondict = {
                 "sniffer_serial": SNIFFER_SERIAL,
-                "address": dev.addr,
+                "beacon_addr": dev.addr,
                 "rssi": int(dev.rssi),
                 "event_time": now_string
             }
+
+            print("Sending data to master...")
 
             # send dictionary with update data here
             req = requests.put('http://192.168.4.1/api/event/',
                                headers={'content-type': 'application/json'},
                                json=beacondict
                                )
-            print("Sending data to master...")
+
 
             # 400 is if the code sent is not a json file or not able to be sent in a json packet
             if req.status_code == 201:
