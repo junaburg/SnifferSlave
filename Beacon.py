@@ -43,7 +43,7 @@ class SnifferDelegate(DefaultDelegate):
             now = datetime.now()
             now_string = now.strftime("%d-%m-%Y %H:%M:%S.%fZ")
             print(f"my name is {dev.getValueText(9)}")
-            if dev.getValueText(9) != None:
+            if dev.getValueText(9) is not None:
                 LOGGER.info("Found beacon at %s name: %s", dev.addr, dev.getValueText(9))
             else:
                 LOGGER.info("no characteristics recieved")
@@ -70,7 +70,6 @@ class SnifferDelegate(DefaultDelegate):
                 print("the data is incorrectly formatted or sent incorrectly")
                 print(req.text)
                 LOGGER.error("the data sent is formatted incorrectly")
-
             else:
                 print("there was an error not listed")
                 LOGGER.error("a status code not listed was returned")
@@ -78,7 +77,6 @@ class SnifferDelegate(DefaultDelegate):
             # There was an error processing the request
 
             req.close()
-            return True
 
 
 if __name__ == '__main__':
